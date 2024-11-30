@@ -739,33 +739,33 @@
   }
 
   let to-display = layout(layout-size => {
-    context {
-      let body-size = measure(body)
-      let bounding-width = calc.min(body-size.width, layout-size.width)
-      let wrapped-body-size = measure(box(body, width: bounding-width))
-      let named = cover-args.named()
-      if "width" not in named {
-        named.insert("width", wrapped-body-size.width)
-      }
-      if "height" not in named {
-        named.insert("height", wrapped-body-size.height)
-      }
-      if "outset" not in named {
-        // This outset covers the tops of tall letters and the bottoms of letters with
-        // descenders. Alternatively, we could use
-        // `set text(top-edge: "bounds", bottom-edge: "bounds")` to get the same effect,
-        // but this changes text alignment and also misaligns bullets in enums/lists.
-        // In contrast, `outset` preserves spacing and alignment at the cost of adding
-        // a slight, visible border when the covered object is right next to the edge
-        // of a color change.
-        named.insert("outset", (top: 0.15em, bottom: 0.25em))
-      }
-      stack(
-        spacing: -wrapped-body-size.height,
-        body,
-        rect(fill: fill, ..named, ..cover-args.pos()),
-      )
+    let body-size = measure(body)
+    let bounding-width = calc.min(body-size.width, layout-size.width)
+    let wrapped-body-size = measure(box(body, width: bounding-width))
+    let named = cover-args.named()
+    if "width" not in named {
+      named.insert("width", wrapped-body-size.width)
     }
+    if "height" not in named {
+      named.insert("height", wrapped-body-size.height)
+    }
+    if "outset" not in named {
+      // This outset covers the tops of tall letters and the bottoms of letters with
+      // descenders. Alternatively, we could use
+      // `set text(top-edge: "bounds", bottom-edge: "bounds")` to get the same effect,
+      // but this changes text alignment and also misaligns bullets in enums/lists.
+      // In contrast, `outset` preserves spacing and alignment at the cost of adding
+      // a slight, visible border when the covered object is right next to the edge
+      // of a color change.
+      let margin-top = measure(text(body, top-edge: "bounds")).height - wrapped-body-size.height
+      let margin-bottom = measure(text(body, top-edge: "bounds")).height - wrapped-body-size.height
+      named.insert("outset", (top: margin-top, bottom: margin-bottom))
+    }
+    stack(
+      spacing: -wrapped-body-size.height,
+      body,
+      rect(fill: fill, ..named, ..cover-args.pos()),
+    )
   })
   if inline {
     box(to-display)
